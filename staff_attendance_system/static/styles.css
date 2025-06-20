@@ -1,0 +1,312 @@
+/* -------------------------------------------------
+   Core palette
+-------------------------------------------------- */
+:root {
+  --bg-main: #0d1117;         /* page background */
+  --bg-surface: #161b22;      /* cards / panels */
+  --bg-hover: #21262d;        /* hovered rows, buttons */
+  --accent: #f0b90b;          /* gold accent */
+  --text-primary: #e6edf3;    /* main text */
+  --text-muted: #8b949e;      /* muted labels */
+  --danger: #e55353;          /* delete / error */
+  --radius: 8px;
+  --transition: 0.2s ease;
+  font-size: 16px;
+}
+
+/* -------------------------------------------------
+   Resets & basics
+-------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: var(--bg-main);
+  color: var(--text-primary);
+  font-family: "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+a:hover {
+  color: var(--accent);
+}
+
+/* -------------------------------------------------
+   Global navigation
+-------------------------------------------------- */
+nav {
+  background: var(--bg-surface);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+.nav-links {
+  display: flex;
+  gap: 1.25rem;
+  font-weight: 500;
+}
+.nav-links a {
+  position: relative;
+}
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width var(--transition);
+}
+.nav-links a:hover::after,
+.nav-links a.active::after {
+  width: 100%;
+}
+button.admin-login {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+button.admin-login:hover {
+  background: var(--accent);
+  color: var(--bg-main);
+}
+
+/* -------------------------------------------------
+   Main layout container
+-------------------------------------------------- */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+
+/* -------------------------------------------------
+   Login page
+-------------------------------------------------- */
+.login-container {
+  background: var(--bg-surface);
+  padding: 2.5rem 3rem;
+  width: min(380px, 90%);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+.login-container h2 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+.login-container input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #30363d;
+  border-radius: var(--radius);
+  background: var(--bg-main);
+  color: var(--text-primary);
+}
+.login-container button {
+  width: 100%;
+  padding: 0.65rem;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+.login-container button:hover {
+  opacity: 0.85;
+}
+.error {
+  color: var(--danger);
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+/* -------------------------------------------------
+   Dashboard headline
+-------------------------------------------------- */
+main h1 {
+  text-align: center;
+  font-size: 1.75rem;
+  margin-bottom: 2rem;
+}
+main h1 span {
+  color: var(--accent);
+}
+
+/* -------------------------------------------------
+   Clock‑In / Clock‑Out panel
+-------------------------------------------------- */
+.attendance-box {
+  background: var(--bg-surface);
+  padding: 1.75rem 2rem;
+  border-radius: var(--radius);
+  width: min(480px, 95%);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+}
+.attendance-box label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--text-muted);
+}
+.attendance-box input[type="text"] {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1.25rem;
+  border-radius: var(--radius);
+  border: 1px solid #30363d;
+  background: var(--bg-main);
+  color: var(--text-primary);
+}
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.button-group button {
+  flex: 1;
+  padding: 0.75rem 0;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+.button-group button:hover {
+  opacity: 0.85;
+}
+.radio-group {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  color: var(--text-muted);
+}
+.radio-group input {
+  accent-color: var(--accent);
+}
+
+/* -------------------------------------------------
+   Tables (Attendance / Employees)
+-------------------------------------------------- */
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  background: var(--bg-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.attendance-table thead {
+  background: #1f242c;
+}
+.attendance-table th,
+.attendance-table td {
+  padding: 0.75rem 0.9rem;
+  text-align: left;
+}
+.attendance-table th {
+  font-weight: 600;
+  color: var(--accent);
+  border-bottom: 1px solid #30363d;
+}
+.attendance-table tbody tr:nth-child(even) {
+  background: var(--bg-hover);
+}
+.attendance-table tbody tr:hover {
+  background: #2b313a;
+}
+.attendance-table button {
+  padding: 0.35rem 0.75rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: opacity var(--transition);
+}
+.attendance-table button:hover {
+  opacity: 0.85;
+}
+.attendance-table .edit-btn {
+  background: var(--accent);
+  color: var(--bg-main);
+}
+.attendance-table .delete-btn {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* -------------------------------------------------
+   Filter / form blocks
+-------------------------------------------------- */
+.report-form,
+#employeeForm {
+  background: var(--bg-surface);
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+.report-form label,
+#employeeForm label {
+  color: var(--text-muted);
+}
+.report-form input,
+.report-form select,
+#employeeForm input,
+#employeeForm select {
+  background: var(--bg-main);
+  border: 1px solid #30363d;
+  border-radius: var(--radius);
+  padding: 0.45rem 0.6rem;
+  color: var(--text-primary);
+}
+.report-form button,
+#employeeForm button {
+  background: var(--accent);
+  border: none;
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity var(--transition);
+}
+.report-form button:hover,
+#employeeForm button:hover {
+  opacity: 0.85;
+}
+
+/* -------------------------------------------------
+   Responsive tweaks
+-------------------------------------------------- */
+@media (max-width: 700px) {
+  .nav-links { flex-wrap: wrap; gap: 0.75rem; }
+  main h1 { font-size: 1.4rem; }
+  .attendance-table th, .attendance-table td { font-size: 0.85rem; }
+}

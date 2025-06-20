@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Attendance Reports</title> 
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-links">
+      <a href="{{ url_for('attendance') }}">Attendance</a>
+      <a href="{{ url_for('employees') }}">Employees</a>
+      <a href="{{ url_for('reports') }}" class="active">Reports</a>
+    </div>
+    <button class="admin-login" onclick="window.location.href='{{ url_for('logout') }}'">Logout</button>
+  </nav>
+
+  <main>
+    <h1>Attendance Report</h1>
+
+    <!-- Date filter section -->
+    <div class="filter-controls">
+      <label for="reportDate">Select Date:</label>
+      <input type="date" id="reportDate" />
+      <button onclick="filterBy('daily')">Daily</button>
+      <button onclick="filterBy('weekly')">Weekly</button>
+      <button onclick="filterBy('monthly')">Monthly</button>
+    </div>
+
+    <!-- Entry/Exit/All Report Buttons -->
+    <div class="report-buttons">
+      <button onclick="filterBy('entry')" class="report-btn">Entry Report</button>
+      <button onclick="filterBy('exit')" class="report-btn">Exit Report</button>
+      <button onclick="filterBy('all')" class="report-btn">All Reports</button>
+    </div>
+
+    <!-- Download Buttons -->
+    <div class="report-buttons" style="margin-top: 1rem;">
+      <button onclick="downloadReport('entry')" class="report-btn">Download Entry Report</button>
+      <button onclick="downloadReport('exit')" class="report-btn">Download Exit Report</button>
+      <button onclick="downloadReport('all')" class="report-btn">Download All Reports</button>
+    </div>
+
+    <!-- Report Table -->
+    <table class="attendance-table" id="reportTable">
+      <thead>
+        <tr>
+          <th>Employee ID</th>
+          <th>Full Name</th>
+          <th>Job Position</th>
+          <th>Department</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Method</th>
+          <th>Total Hours</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
+
+  <script>
+    const attendanceLogs = [
+      {
+        empId: "EMP001",
+        fullName: "John Banda",
+        position: "Software Engineer",
+        department: "IT",
+        phone: "0977123456",
+        email: "john.banda@example.com",
+        date: "2025-06-20",
+        time: "08:01",
+        type: "Entry"
+      },
+      {
+        empId: "EMP001",
+        fullName: "John Banda",
+        position: "Software Engineer",
+        department: "IT",
+        phone: "0977123456",
+        email: "john.banda@example.com",
+        date: "2025-06-20",
+        time: "17:01",
+        type: "Exit"
+      },
+      {
+        empId: "EMP002",
+        fullName: "Mary Zulu",
+        position: "Admin Assistant",
+        department: "HR",
+        phone: "0969123456",
+        email: "mary.zulu@example.com",
+        date: "2025-06-20",
+        time: "08:15",
+        type: "Entry"
+      },
+      {
+        empId: "EMP002",
+        fullName: "Mary Zulu",
+        position: "Admin Assistant",
+        department: "HR",
+        phone: "0969123456",
+        email: "mary.zulu@example.com",
+        date: "2025-06-20",
+        time: "16:59",
+        type: "Exit"
+      }
+    ];
+
+    function calculateTotalHours(entries) {
+      const entry = entries.find(e => e.type === 'Entry')?.time;
+      const exit = entries.find(e => e.type === 'Exit')?.time;
+
+      if (!entry || !exit) return '--';
+
+      const [h1, m1] = entry.split(':').map(Number);
+      const [h2, m2] = exit.split(':').map(Number);
+      const inMins = h1 * 60 + m1;
+      const outMins = h2 * 60 + m2;
+      const total = outMins - inMins;
+
+      if (total < 0) return '--';
+
+      const hrs = Math.floor(total / 60);
+      const mins = total % 60;
+      return `${hrs}h ${mins}m`;
+    }
+
+    function renderRows(logs) {
+      const tbody = document.querySelector('#reportTable tbody');
+      tbody.innerHTML = '';
+
+      const grouped = {};
+
+      logs.forEach(log => {
+        const key = `${log.empId}-${log.date}`;
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(log);
+      });
+
+      Object.values(grouped).forEach(records => {
+        records.forEach(log => {
+          const total = calculateTotalHours(records);
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${log.empId}</td>
+            <td>${log.fullName}</td>
+            <td>${log.position}</td>
+            <td>${log.department}</td>
+            <td>${log.date}</td>
+            <td>${log.time}</td>
+            <td>${log.phone}</td>
+            <td>${log.email}</td>
+            <td>${log.type}</td>
+            <td>${total}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
+    }
+
+    function filterBy(type) {
+      const selectedDate = document.getElementById('reportDate').value;
+      if (!selectedDate) return alert('Please select a date.');
+
+      const date = new Date(selectedDate);
+      let filtered = [];
+
+      if (type === 'daily') {
+        filtered = attendanceLogs.filter(log => log.date === selectedDate);
+      } else if (type === 'weekly') {
+        const start = new Date(date);
+        start.setDate(date.getDate() - date.getDay());
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        filtered = attendanceLogs.filter(log => {
+          const d = new Date(log.date);
+          return d >= start && d <= end;
+        });
+      } else if (type === 'monthly') {
+        const m = date.getMonth();
+        const y = date.getFullYear();
+        filtered = attendanceLogs.filter(log => {
+          const d = new Date(log.date);
+          return d.getFullYear() === y && d.getMonth() === m;
+        });
+      } else if (type === 'entry') {
+        filtered = attendanceLogs.filter(log => log.type === 'Entry' && log.date === selectedDate);
+      } else if (type === 'exit') {
+        filtered = attendanceLogs.filter(log => log.type === 'Exit' && log.date === selectedDate);
+      } else if (type === 'all') {
+        filtered = attendanceLogs.filter(log => log.date === selectedDate);
+      }
+
+      renderRows(filtered);
+    }
+
+    function downloadReport(type) {
+      const selectedDate = document.getElementById('reportDate').value;
+      if (!selectedDate) return alert('Please select a date.');
+
+      let dataToDownload = [];
+
+      if (type === 'entry') {
+        dataToDownload = attendanceLogs.filter(log => log.type === 'Entry' && log.date === selectedDate);
+      } else if (type === 'exit') {
+        dataToDownload = attendanceLogs.filter(log => log.type === 'Exit' && log.date === selectedDate);
+      } else if (type === 'all') {
+        dataToDownload = attendanceLogs.filter(log => log.date === selectedDate);
+      }
+
+      if (dataToDownload.length === 0) {
+        alert('No data to download for the selected filter.');
+        return;
+      }
+
+      const headers = ['Employee ID', 'Full Name', 'Job Position', 'Department', 'Date', 'Time', 'Phone', 'Email', 'Method', 'Total Hours'];
+
+      const grouped = {};
+      dataToDownload.forEach(log => {
+        const key = `${log.empId}-${log.date}`;
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(log);
+      });
+
+      let csvRows = [];
+      csvRows.push(headers.join(','));
+
+      Object.values(grouped).forEach(records => {
+        records.forEach(log => {
+          const total = calculateTotalHours(records);
+          const row = [
+            `"${log.empId}"`,
+            `"${log.fullName}"`,
+            `"${log.position}"`,
+            `"${log.department}"`,
+            `"${log.date}"`,
+            `"${log.time}"`,
+            `"${log.phone}"`,
+            `"${log.email}"`,
+            `"${log.type}"`,
+            `"${total}"`
+          ];
+          csvRows.push(row.join(','));
+        });
+      });
+
+      const csvString = csvRows.join('\n');
+      const blob = new Blob([csvString], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `attendance_report_${type}_${selectedDate}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Set default date to today and load data
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('reportDate').value = today;
+    renderRows(attendanceLogs.filter(log => log.date === today));
+
+    document.getElementById('reportDate').addEventListener('change', e => {
+      renderRows(attendanceLogs.filter(log => log.date === e.target.value));
+    });
+  </script>
+
+</body>
+</html>

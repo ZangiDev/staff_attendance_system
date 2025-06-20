@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Attendance Records</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+  <!-- Removed sessionStorage JS check -->
+
+  <nav>
+    <div class="nav-links">
+      <a href="{{ url_for('attendance') }}" class="active">Attendance</a>
+      <a href="{{ url_for('employees') }}">Employees</a>
+      <a href="{{ url_for('reports') }}">Reports</a>
+    </div>
+    <button class="admin-login" onclick="window.location.href='{{ url_for('logout') }}'">Logout</button>
+  </nav>
+
+  <main>
+    <h1>Employee Attendance</h1>
+
+    <div class="button-group" style="margin-bottom: 1.5rem;">
+      <button id="entryBtn">Entry Records</button>
+      <button id="exitBtn">Exit Records</button>
+    </div>
+
+    <table class="attendance-table" id="attendanceTable">
+      <thead>
+        <tr>
+          <th>Employee ID</th>
+          <th>Full Name</th>
+          <th>Job Position</th>
+          <th>Department</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Method</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Attendance rows will be populated here -->
+      </tbody>
+    </table>
+  </main>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script>
+    const sampleAttendance = [
+      {
+        empId: "EMP001",
+        fullName: "John Banda",
+        position: "Software Engineer",
+        department: "IT",
+        date: "2025-06-20",
+        time: "08:01",
+        phone: "0977123456",
+        email: "john.banda@example.com",
+        method: "Face",
+        type: "Entry"
+      },
+      {
+        empId: "EMP001",
+        fullName: "John Banda",
+        position: "Software Engineer",
+        department: "IT",
+        date: "2025-06-20",
+        time: "17:00",
+        phone: "0977123456",
+        email: "john.banda@example.com",
+        method: "Face",
+        type: "Exit"
+      },
+      {
+        empId: "EMP002",
+        fullName: "Mary Zulu",
+        position: "Admin Assistant",
+        department: "HR",
+        date: "2025-06-20",
+        time: "08:05",
+        phone: "0969123456",
+        email: "mary.zulu@example.com",
+        method: "Fingerprint",
+        type: "Entry"
+      },
+      {
+        empId: "EMP002",
+        fullName: "Mary Zulu",
+        position: "Admin Assistant",
+        department: "HR",
+        date: "2025-06-20",
+        time: "17:12",
+        phone: "0969123456",
+        email: "mary.zulu@example.com",
+        method: "Fingerprint",
+        type: "Exit"
+      }
+    ];
+
+    function renderAttendance(type) {
+      const tbody = document.querySelector('#attendanceTable tbody');
+      tbody.innerHTML = '';
+
+      const filtered = sampleAttendance.filter(a => a.type === type);
+
+      filtered.forEach(emp => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${emp.empId}</td>
+          <td>${emp.fullName}</td>
+          <td>${emp.position}</td>
+          <td>${emp.department}</td>
+          <td>${emp.date}</td>
+          <td>${emp.time}</td>
+          <td>${emp.phone}</td>
+          <td>${emp.email}</td>
+          <td>${emp.method}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Default to Entry on load
+    renderAttendance("Entry");
+
+    document.getElementById('entryBtn').addEventListener('click', () => renderAttendance("Entry"));
+    document.getElementById('exitBtn').addEventListener('click', () => renderAttendance("Exit"));
+  </script>
+
+</body>
+</html>
