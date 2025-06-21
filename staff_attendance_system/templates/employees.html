@@ -46,8 +46,15 @@
       <label for="email">Email</label>
       <input type="email" id="email" placeholder="name@example.com" required>
 
+      <button type="button" onclick="enrollFace()" style="margin-top: 5px;">Enroll Face</button>
+      <button type="button" onclick="enrollFingerprint()" style="margin-top: 5px;">Enroll Fingerprint</button>
+
       <button type="submit">Save</button>
     </form>
+
+    <!-- ✅ Webcam preview and canvas -->
+    <video id="cameraPreview" autoplay playsinline width="320" height="240" style="display:none; border: 2px solid #f0b90b; margin-top: 1rem;"></video>
+    <canvas id="faceCanvas" style="display: none;"></canvas>
 
     <!-- Search bar -->
     <input
@@ -75,10 +82,9 @@
   </main>
 
   <script>
-    // In‑memory list (replace with DB calls later)
     let employees = [];
+    let stream = null;
 
-    /* ===== Form submission ===== */
     document.getElementById('employeeForm').addEventListener('submit', e => {
       e.preventDefault();
 
@@ -94,9 +100,9 @@
 
       const idx = editIndex.value;
       if (idx === '') {
-        employees.push(data);        // add new
+        employees.push(data);
       } else {
-        employees[idx] = data;       // update
+        employees[idx] = data;
         editIndex.value = '';
       }
 
@@ -104,7 +110,6 @@
       renderEmployees();
     });
 
-    /* ===== Render table ===== */
     function renderEmployees(filter = '') {
       const tbody = document.querySelector('#employeeTable tbody');
       tbody.innerHTML = '';
@@ -135,7 +140,6 @@
         });
     }
 
-    /* ===== Edit / Delete handlers ===== */
     window.editEmp = idx => {
       const emp = employees[idx];
       empId.value = emp.empId;
@@ -155,11 +159,73 @@
       }
     };
 
-    /* ===== Live search ===== */
     searchInput.addEventListener('input', e => renderEmployees(e.target.value));
-
-    // initial render
     renderEmployees();
+
+    // Biometric enrollment scripts
+    function enrollFace() {
+      const video = document.getElementById('cameraPreview');
+      video.style.display = 'block';
+
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(camStream => {
+          stream = camStream;
+          video.srcObject = stream;
+          alert("Press 'C' to capture the face");
+        })
+        .catch(err => {
+          console.error("Camera access error:", err);
+          alert("Unable to access the camera.");
+        });
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key.toLowerCase() === 'c') {
+        captureAndSendFace();
+      }
+    });
+
+    function captureAndSendFace() {
+      const empId = document.getElementById('empId').value;
+      if (!empId) return alert('Please enter Employee ID first');
+
+      const video = document.getElementById('cameraPreview');
+      const canvas = document.getElementById('faceCanvas');
+      const context = canvas.getContext('2d');
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const imageData = canvas.toDataURL('image/jpeg');
+
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      video.style.display = 'none';
+
+      fetch(`/enroll_face/${empId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: imageData })
+      })
+        .then(res => res.json())
+        .then(data => alert(data.status || 'Face enrolled successfully!'))
+        .catch(err => console.error(err));
+    }
+
+    function enrollFingerprint() {
+      const empId = document.getElementById('empId').value;
+      if (!empId) return alert('Please enter Employee ID first');
+
+      fetch(`/enroll_fingerprint/${empId}`, {
+        method: 'POST'
+      })
+        .then(res => res.json())
+        .then(data => alert(data.status || 'Fingerprint enrolled successfully!'))
+        .catch(err => console.error(err));
+    }
   </script>
 
 </body>

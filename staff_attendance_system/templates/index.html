@@ -13,11 +13,8 @@
       <a href="#">Attendance</a>
       <a href="#">Employees</a>
       <a href="#">Reports</a>
-    
-
     </div>
     <button class="admin-login" onclick="window.location.href='{{ url_for('admin_login') }}'">Admin Login</button>
-
   </nav>
 
   <main>
@@ -28,7 +25,8 @@
       <input type="text" id="employeeId" placeholder="Enter Employee ID">
 
       <div class="button-group">
-        <button onclick="faceRecognition()">Face Recognition</button>
+        <button type="button" onclick="faceRecognition()">Face Recognition</button>
+
         <button onclick="fingerprintScan()">Fingerprint Scan</button>
       </div>
 
@@ -36,6 +34,10 @@
         <label><input type="radio" name="entryExit" value="entry" checked> Entry</label>
         <label><input type="radio" name="entryExit" value="exit"> Exit</label>
       </div>
+
+      <!-- 👇 Added webcam elements -->
+      <video id="video" width="320" height="240" autoplay muted style="display: none;"></video>
+      <canvas id="canvas" width="320" height="240" style="display: none;"></canvas>
     </div>
   </main>
 

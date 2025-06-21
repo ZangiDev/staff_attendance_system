@@ -8,8 +8,6 @@
 </head>
 <body>
 
-  <!-- Removed sessionStorage JS check -->
-
   <nav>
     <div class="nav-links">
       <a href="{{ url_for('attendance') }}" class="active">Attendance</a>
@@ -42,85 +40,41 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Attendance rows will be populated here -->
+        <!-- Real attendance rows will be dynamically inserted here -->
       </tbody>
     </table>
   </main>
 
   <script src="{{ url_for('static', filename='script.js') }}"></script>
   <script>
-    const sampleAttendance = [
-      {
-        empId: "EMP001",
-        fullName: "John Banda",
-        position: "Software Engineer",
-        department: "IT",
-        date: "2025-06-20",
-        time: "08:01",
-        phone: "0977123456",
-        email: "john.banda@example.com",
-        method: "Face",
-        type: "Entry"
-      },
-      {
-        empId: "EMP001",
-        fullName: "John Banda",
-        position: "Software Engineer",
-        department: "IT",
-        date: "2025-06-20",
-        time: "17:00",
-        phone: "0977123456",
-        email: "john.banda@example.com",
-        method: "Face",
-        type: "Exit"
-      },
-      {
-        empId: "EMP002",
-        fullName: "Mary Zulu",
-        position: "Admin Assistant",
-        department: "HR",
-        date: "2025-06-20",
-        time: "08:05",
-        phone: "0969123456",
-        email: "mary.zulu@example.com",
-        method: "Fingerprint",
-        type: "Entry"
-      },
-      {
-        empId: "EMP002",
-        fullName: "Mary Zulu",
-        position: "Admin Assistant",
-        department: "HR",
-        date: "2025-06-20",
-        time: "17:12",
-        phone: "0969123456",
-        email: "mary.zulu@example.com",
-        method: "Fingerprint",
-        type: "Exit"
-      }
-    ];
-
     function renderAttendance(type) {
       const tbody = document.querySelector('#attendanceTable tbody');
       tbody.innerHTML = '';
 
-      const filtered = sampleAttendance.filter(a => a.type === type);
-
-      filtered.forEach(emp => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${emp.empId}</td>
-          <td>${emp.fullName}</td>
-          <td>${emp.position}</td>
-          <td>${emp.department}</td>
-          <td>${emp.date}</td>
-          <td>${emp.time}</td>
-          <td>${emp.phone}</td>
-          <td>${emp.email}</td>
-          <td>${emp.method}</td>
-        `;
-        tbody.appendChild(row);
-      });
+      // Example: Fetch real data from your backend via API
+      fetch(`/api/attendance?type=${type}`)
+        .then(res => res.json())
+        .then(records => {
+          records.forEach(emp => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${emp.empId}</td>
+              <td>${emp.fullName}</td>
+              <td>${emp.position}</td>
+              <td>${emp.department}</td>
+              <td>${emp.date}</td>
+              <td>${emp.time}</td>
+              <td>${emp.phone}</td>
+              <td>${emp.email}</td>
+              <td>${emp.method}</td>
+            `;
+            tbody.appendChild(row);
+          });
+        })
+        .catch(err => {
+          console.error("Failed to load attendance:", err);
+          tbody.innerHTML = '<tr><td colspan="9">Failed to load attendance data</td></tr>';
+        });
     }
 
     // Default to Entry on load

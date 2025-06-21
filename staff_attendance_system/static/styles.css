@@ -310,3 +310,14 @@ main h1 span {
   main h1 { font-size: 1.4rem; }
   .attendance-table th, .attendance-table td { font-size: 0.85rem; }
 }
+.video-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+#video {
+  border: 2px solid #ffc107;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+}
